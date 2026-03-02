@@ -55,6 +55,34 @@ function previewAdminImage(input, previewId) {
 }
 
 // Save back to Firebase and trigger public re-render
+window.diagnoseFirebase = function () {
+    if (typeof db !== 'undefined') {
+        console.log("Running Firebase Diagnostics...");
+        db.ref('.info/connected').once('value').then((snap) => {
+            console.log("Is Connected to Firebase servers?", snap.val());
+            if (snap.val() === true) {
+                // Try writing a tiny test string to see if rules allow it
+                const testRef = db.ref('babuPremiumData_TestWrite');
+                testRef.set("test_write_123")
+                    .then(() => {
+                        console.log("✅ SUCCESS: You have WRITE permissions to the database.");
+                        alert("✅ SUCCESS: You have WRITE permissions to the database.");
+                        testRef.remove(); // Clean up
+                    })
+                    .catch((error) => {
+                        console.error("❌ FAILED: Write permission denied.");
+                        console.error("Firebase Error Details:", error);
+                        alert("Firebase Security Rules are blocking writes! Please check your Realtime Database Rules.");
+                    });
+            } else {
+                alert("Firebase connection failed completely.");
+            }
+        });
+    } else {
+        alert("Firebase is not initialized.");
+    }
+};
+
 function saveAdminToDB() {
     if (typeof db !== 'undefined') {
         const payloadSize = JSON.stringify(appData).length;

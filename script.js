@@ -55,7 +55,7 @@ const defaultData = {
 const firebaseConfig = {
     apiKey: "AIzaSyBz-PJMfwHhaze5wovyat0aUAJ1p83mBnM",
     authDomain: "babu-collection-8abd1.firebaseapp.com",
-    databaseURL: "https://babu-collection-8abd1-default-rtdb.firebaseio.com",
+    databaseURL: "https://babu-collection-8abd1-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "babu-collection-8abd1",
     storageBucket: "babu-collection-8abd1.firebasestorage.app",
     messagingSenderId: "622436087584",
