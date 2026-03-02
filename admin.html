@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Babu Collection</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=4">
+
+    <style>
+        /* Admin specific sidebar styles */
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            /* Hidden by default */
+            width: 450px;
+            max-width: 100vw;
+            height: 100vh;
+            background: #111;
+            border-left: 2px solid var(--gold-primary);
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            z-index: 100000;
+            overflow-y: auto;
+            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .admin-sidebar.open {
+            right: 0;
+        }
+
+        .admin-sidebar h1 {
+            color: var(--gold-primary);
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        .admin-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99999;
+            backdrop-filter: blur(5px);
+            display: none;
+        }
+
+        .admin-overlay.open {
+            display: block;
+        }
+
+        .admin-toggle-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            /* Put on left so it doesn't block WhatsApp */
+            background: var(--gold-primary);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            z-index: 90000;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .admin-toggle-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .close-admin-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-admin-btn:hover {
+            color: var(--gold-primary);
+        }
+
+        .admin-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .admin-card {
+            background: #222;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .admin-form-group {
+            margin-bottom: 15px;
+        }
+
+        .admin-form-group label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+
+        .admin-form-group input,
+        .admin-form-group textarea,
+        .admin-form-group select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #000;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .admin-btn {
+            background: var(--gold-primary);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .admin-btn:hover {
+            background: #b5952f;
+        }
+
+        .admin-btn-danger {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .img-preview {
+            max-width: 100%;
+            max-height: 120px;
+            display: block;
+            margin-top: 10px;
+            border: 1px dashed var(--gold-primary);
+            border-radius: 4px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        .admin-table th {
+            color: var(--gold-primary);
+        }
+
+        .admin-table img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        #admin-notif {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 4px;
+            font-weight: bold;
+            transform: translateY(-100px);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100001;
+        }
+
+        #admin-notif.show {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+
+    <div id="admin-notif"><i class="fas fa-check-circle"></i> Changes Saved Instantly!</div>
+
+    <!-- Overlay -->
+    <div class="admin-overlay" id="adminOverlay" onclick="toggleAdminPanel()"></div>
+
+    <!-- ADMIN PANEL SIDEBAR -->
+    <section class="admin-sidebar" id="adminSidebar">
+        <button class="close-admin-btn" onclick="toggleAdminPanel()"><i class="fas fa-times"></i></button>
+
+        <div style="padding-top:10px;">
+            <h1><i class="fas fa-cogs"></i> Admin Panel</h1>
+            <p style="margin-bottom:20px; color:#aaa; font-size:0.9rem;">Changes instantly update the live site.</p>
+
+            <div class="admin-grid">
+                <!-- Manage Products -->
+                <div class="admin-card">
+                    <h3 style="color:var(--gold-primary); margin-top:0;"><i class="fas fa-box"></i> Manage Products</h3>
+                    <div class="admin-form-group">
+                        <label>Category</label>
+                        <select id="prodCategorySelect" onchange="loadAdminProducts()">
+                            <option value="sherwani">Sherwani</option>
+                            <option value="princecoat">Prince Coat</option>
+                            <option value="threepiece">Three Piece Suit</option>
+                            <option value="waistcoat">Waistcoat</option>
+                            <option value="bridal">Bridal Lehnga</option>
+                        </select>
+                    </div>
+                    <hr style="border-color:#333; margin:15px 0;">
+                    <div class="admin-form-group"><label>Product Title</label><input type="text" id="newProdTitle">
+                    </div>
+                    <div class="admin-form-group"><label>Description</label><input type="text" id="newProdDesc"></div>
+                    <div class="admin-form-group"><label>Price (Rate)</label><input type="text" id="newProdPrice"
+                            placeholder="e.g. Rs. 45,000"></div>
+                    <input type="hidden" id="editProdIndex" value="-1">
+                    <div class="admin-form-group">
+                        <label>Image</label>
+                        <input type="file" id="newProdFile" onchange="previewAdminImage(this, 'newProdImg')">
+                        <img id="newProdImg" class="img-preview" src="" data-base64="">
+                    </div>
+                    <button class="admin-btn" id="saveProductBtn" onclick="addNewAdminProduct()"><i
+                            class="fas fa-plus"></i> Add Product</button>
+                    <button class="admin-btn" id="cancelEditBtn" onclick="resetAdminProductForm()"
+                        style="background:#444; color:#fff; display:none; margin-top:10px;">Cancel Edit</button>
+
+                    <div
+                        style="margin-top:20px; max-height:200px; overflow-y:auto; border-top: 1px solid #444; padding-top: 10px;">
+                        <table class="admin-table" id="adminProductsTable">
+                            <thead>
+                                <tr>
+                                    <th>Img</th>
+                                    <th>Title</th>
+                                    <th>Price</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Manage Texts & Reviews -->
+                <div class="admin-card">
+                    <h3 style="color:var(--gold-primary); margin-top:0;"><i class="fas fa-font"></i> Website Details
+                    </h3>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group"><label>Clients Served</label><input type="text"
+                                id="admin_statClients"></div>
+                        <div class="admin-form-group"><label>Satisfaction Rate</label><input type="text"
+                                id="admin_statRate"></div>
+                    </div>
+                    <div class="admin-form-group"><label>Owner Story</label><textarea id="admin_ownerStory"
+                            rows="3"></textarea></div>
+                    <button class="admin-btn" onclick="saveAdminTexts()"><i class="fas fa-save"></i> Save Texts</button>
+
+                    <hr style="border-color:#333; margin:20px 0;">
+
+                    <h3 style="color:var(--gold-primary); margin-top:0;"><i class="fas fa-star"></i> Manage Reviews</h3>
+                    <div class="admin-form-group"><label>Client Name</label><input type="text" id="newRevName"></div>
+                    <div class="admin-form-group"><label>Review Text</label><textarea id="newRevText"
+                            rows="2"></textarea></div>
+                    <button class="admin-btn" onclick="addAdminReview()"><i class="fas fa-plus"></i> Add Review</button>
+
+                    <div
+                        style="margin-top:20px; max-height:150px; overflow-y:auto; border-top: 1px solid #444; padding-top: 10px;">
+                        <table class="admin-table" id="adminReviewsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Top Contact Bar -->
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div><i class="fas fa-user-tie text-gold"></i> Amjad Makki (Owner)</div>
+            <div class="top-bar-right">
+                <span><i class="fab fa-whatsapp text-gold"></i> +92 332 5158303</span>
+                <span><i class="fas fa-map-marker-alt text-gold"></i> Rizwan Arcade, Pizza Hutt Plaza, Addam Gee Road,
+                    Saddar, Rawalpindi</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <header class="navbar" id="navbar">
+        <div class="logo">
+            <h1 class="logo-text" id="siteTitle">Babu Collection</h1>
+            <p class="logo-subtext">Premium Design & Fashion Store</p>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#offer">What We Offer</a></li>
+                <li><a href="#collections">Collections</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+        </nav>
+        <div class="nav-right">
+            <button onclick="toggleAdminPanel()" class="btn-primary glow-effect"
+                style="padding:10px 20px; font-size:0.9rem; cursor:pointer;">
+                <i class="fas fa-edit"></i> Manage Products
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero" style="min-height:70vh; position: relative;">
+        <!-- Direct Hero Edit Button -->
+        <button class="admin-edit-btn pulse-anim" onclick="document.getElementById('directHeroFileInput').click()"
+            style="position: absolute; top: 120px; right: 20px; z-index: 9999; padding: 10px 20px; font-size: 1.1rem; display: block; border-radius: 8px;">
+            <i class="fas fa-image"></i> Edit Main Picture
+        </button>
+        <input type="file" id="directHeroFileInput" style="display:none;"
+            onchange="handleDirectImageUpload(this, 'heroBg')">
+
+        <div class="hero-video-bg">
+            <img src="images/sherwani.png" class="hero-bg-img" alt="Hero Bg" id="hero-background-img">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content" data-aos="fade-up" data-aos-duration="1500">
+            <h2 class="subtitle" id="heroSubtitle">Experience True Royalty</h2>
+            <h1 class="main-title text-glow" id="heroTitle">Elegance Redefined</h1>
+            <p class="lead" id="heroDesc">Discover our luxurious Groom and Bridal wear, exclusively tailored for your
+                big day.</p>
+            <a href="#collections" class="btn-primary" style="margin-top: 20px;">Explore Collections</a>
+        </div>
+    </section>
+
+    <!-- Core Ethos (Mission, Vision, Values, Why Choose Us) -->
+    <section id="about" class="ethos-section">
+        <div class="container">
+            <!-- Why Choose Us -->
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Why Choose Babu Collection?</h2>
+                <div class="title-separator"></div>
+            </div>
+
+            <div class="features-grid" style="margin-bottom: 80px;">
+                <div class="feature-card glass" data-aos="fade-up">
+                    <div class="icon-wrapper"><i class="fas fa-gem"></i></div>
+                    <h3 id="feature1Title">Luxury Craftsmanship</h3>
+                    <p id="feature1Desc">Finest materials and utmost attention to detail.</p>
+                </div>
+                <div class="feature-card glass" data-aos="fade-up" data-aos-delay="100">
+                    <div class="icon-wrapper"><i class="fas fa-cut"></i></div>
+                    <h3 id="feature2Title">Custom Tailoring</h3>
+                    <p id="feature2Desc">Bespoke tailoring tailored specifically to your measurements.</p>
+                </div>
+                <div class="feature-card glass" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon-wrapper"><i class="fas fa-crown"></i></div>
+                    <h3 id="feature3Title">Exclusive Designs</h3>
+                    <p id="feature3Desc">Unique patterns, sophisticated embroidery, and modern cuts.</p>
+                </div>
+            </div>
+
+            <!-- Mission, Vision, Values -->
+            <div class="mvv-container">
+                <div class="mvv-card glass" data-aos="fade-right">
+                    <h3 class="text-gold"><i class="fas fa-bullseye"></i> Our Mission</h3>
+                    <p id="text-mission">To make every groom and bride feel like royalty through uncompromising quality
+                        and unparalleled bespoke service.</p>
+                </div>
+                <div class="mvv-card glass" data-aos="fade-up">
+                    <h3 class="text-gold"><i class="fas fa-eye"></i> Our Vision</h3>
+                    <p id="text-vision">To bring world-class fashion to our people, preserving our culture while
+                        embracing modern luxury.</p>
+                </div>
+                <div class="mvv-card glass" data-aos="fade-left">
+                    <h3 class="text-gold"><i class="fas fa-heart"></i> Our Values</h3>
+                    <p id="text-values">Rooted in quality, integrity, customer satisfaction, and a deep respect for our
+                        heritage.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Owner Profile & Stats Section -->
+    <section class="owner-section glass-bg">
+        <div class="container">
+            <div class="owner-grid">
+                <div class="owner-image-wrapper" data-aos="fade-right" style="position: relative;">
+                    <!-- Direct Owner Edit Button -->
+                    <button class="admin-edit-btn" onclick="document.getElementById('directOwnerFileInput').click()"
+                        style="position: absolute; top: 20px; right: 20px; z-index: 10; display: block; font-size: 1rem; padding: 10px 15px; border-radius: 6px;">
+                        <i class="fas fa-camera"></i> Edit Picture
+                    </button>
+                    <input type="file" id="directOwnerFileInput" style="display: none;"
+                        onchange="handleDirectImageUpload(this, 'ownerImg')">
+
+                    <img src="images/owner.png" alt="Owner" id="owner-img">
+                </div>
+                <div class="owner-content" data-aos="fade-left">
+                    <h4 class="owner-role text-gold" id="ownerRole">Founder & CEO</h4>
+                    <h2 class="section-title text-left" style="margin-bottom: 20px;" id="ownerName">Amjad Makki</h2>
+
+                    <div class="story-content" id="ownerStory">
+                        <p>Established in 2010, Babu Collection began with a simple dream: to redefine elegance and
+                            fashion in Pakistan...</p>
+                    </div>
+
+                    <div class="stats-mini">
+                        <div class="stat">
+                            <span class="counter text-glow" data-target="2010" id="statYear">2010</span>
+                            <label>Est.</label>
+                        </div>
+                        <div class="stat">
+                            <span class="counter text-glow" data-target="15000" id="statClients">15000</span><span
+                                class="text-glow">+</span>
+                            <label>Customers Served</label>
+                        </div>
+                        <div class="stat">
+                            <span class="counter text-glow" data-target="99" id="statRate">99</span><span
+                                class="text-glow">%</span>
+                            <label>Satisfaction Rate</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What We Offer -->
+    <section id="offer" class="offer-section">
+        <div class="container text-center">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">What We Offer</h2>
+                <p class="section-subtitle">A complete ensemble for the modern gentleman and radiant bride.</p>
+                <div class="title-separator"></div>
+            </div>
+
+            <div class="offer-list" data-aos="zoom-in">
+                <span class="offer-tag">Premium Sherwanis</span>
+                <span class="offer-tag">Bespoke Prince Coats</span>
+                <span class="offer-tag">Custom Three-Piece Suits</span>
+                <span class="offer-tag">Embroidered Waistcoats</span>
+                <span class="offer-tag">Bridal Lehngas</span>
+                <span class="offer-tag">Traditional Khussas & Kullas</span>
+                <span class="offer-tag">Tailoring & Alterations</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Masterpiece Collections -->
+    <section id="collections" class="collection-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Our Collections</h2>
+                <div class="title-separator"></div>
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="tabs-container" data-aos="fade-up">
+                <button class="tab-btn active" data-tab="sherwani">Sherwani</button>
+                <button class="tab-btn" data-tab="princecoat">Prince Coat</button>
+                <button class="tab-btn" data-tab="threepiece">Three Piece</button>
+                <button class="tab-btn" data-tab="waistcoat">Waistcoat</button>
+                <button class="tab-btn" data-tab="bridal">Bridal Lehnga</button>
+            </div>
+
+            <div class="tab-content active" id="tab-sherwani">
+                <div class="gallery-grid" id="grid-sherwani"></div>
+            </div>
+            <div class="tab-content" id="tab-princecoat">
+                <div class="gallery-grid" id="grid-princecoat"></div>
+            </div>
+            <div class="tab-content" id="tab-threepiece">
+                <div class="gallery-grid" id="grid-threepiece"></div>
+            </div>
+            <div class="tab-content" id="tab-waistcoat">
+                <div class="gallery-grid" id="grid-waistcoat"></div>
+            </div>
+            <div class="tab-content" id="tab-bridal">
+                <div class="gallery-grid" id="grid-bridal"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews & Customer Feedback Note -->
+    <section id="reviews" class="reviews-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Customer Feedback Note</h2>
+                <div class="title-separator"></div>
+                <p style="margin-top: 20px; color: #ccc; max-width: 800px; margin-inline: auto;">
+                    We deeply value the trust thousands of clients have placed in us. Your satisfaction is the
+                    cornerstone of Babu Collection. Below are honest experiences from our cherished customers.
+                </p>
+            </div>
+
+            <div class="swiper reviewsSwiper" data-aos="fade-up" data-aos-delay="200">
+                <div class="swiper-wrapper" id="reviews-wrapper">
+                    <!-- Loaded via JS -->
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section glass-bg">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <div class="title-separator"></div>
+            </div>
+            <div class="faq-accordion" data-aos="fade-up">
+                <div class="faq-item">
+                    <div class="faq-question">Do you offer custom sizes for Sherwanis and Lehngas? <i
+                            class="fas fa-chevron-down"></i></div>
+                    <div class="faq-answer">Yes, our entire promise relies on Custom Bespoke Tailoring. We take exact
+                        measurements to ensure flawless fitting.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">How do I place an order online? <i class="fas fa-chevron-down"></i></div>
+                    <div class="faq-answer">Browse our collection and click the "Order on WhatsApp" button beneath the
+                        product you like. It will connect you directly to our sales team with your inquiry.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Do you ship outside of Pakistan? <i class="fas fa-chevron-down"></i></div>
+                    <div class="faq-answer">Yes, we provide international shipping for our overseas clients. Delivery
+                        charges and timelines vary by country.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-about">
+                <h3 class="logo-text">Babu Collection</h3>
+                <p>A true symbol of luxury fashion and bespoke tailoring.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+            <div class="footer-contact">
+                <h3>Contact Information</h3>
+                <p><i class="fas fa-map-marker-alt text-gold"></i> Rizwan Arcade, Pizza Hutt Plaza, Addam Gee Road,
+                    Saddar, Rawalpindi, Pakistan</p>
+                <p><i class="fab fa-whatsapp text-gold"></i> +92 332 5158303</p>
+                <p><i class="fas fa-envelope text-gold"></i> info@babucollection.pk</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <span id="current-year"></span> Babu Collection. Established in 2010. All Rights Reserved. <br><a
+                    href="index.html"
+                    style="color:#D4AF37;text-decoration:none;font-weight:bold;font-size:0.9rem;">Return to Live
+                    Site</a></p>
+        </div>
+    </footer>
+
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- Include main script to render the preview below -->
+    <script src="script.js?v=6"></script>
+
+    <!-- Admin functionality -->
+    <script src="admin.js?v=6"></script>
+</body>
+
+</html>

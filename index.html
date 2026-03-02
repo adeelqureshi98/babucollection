@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babu Collection | Premium Design & Fashion</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=4">
+</head>
+
+<body>
+
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+
+    <!-- Top Contact Bar -->
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div><i class="fas fa-user-tie text-gold"></i> Amjad Makki (Owner)</div>
+            <div class="top-bar-right">
+                <span><i class="fab fa-whatsapp text-gold"></i> +92 332 5158303</span>
+                <span><i class="fas fa-map-marker-alt text-gold"></i> Rizwan Arcade, Pizza Hutt Plaza, Addam Gee Road,
+                    Saddar, Rawalpindi</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <header class="navbar" id="navbar">
+        <div class="logo">
+            <h1 class="logo-text" id="siteTitle">Babu Collection</h1>
+            <p class="logo-subtext">Premium Design & Fashion Store</p>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#offer">What We Offer</a></li>
+                <li><a href="#collections">Collections</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+        </nav>
+        <div class="nav-right" style="display:none;">
+            <!-- Removed Order Now button for cleaner look -->
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-video-bg">
+            <img src="images/sherwani.png" class="hero-bg-img" alt="Hero Bg" id="hero-background-img">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content" data-aos="fade-up" data-aos-duration="1500">
+            <h2 class="subtitle" id="heroSubtitle">Experience True Royalty</h2>
+            <h1 class="main-title text-glow" id="heroTitle">Elegance Redefined</h1>
+            <p class="lead" id="heroDesc">Discover our luxurious Groom and Bridal wear, exclusively tailored for your
+                big day.</p>
+            <a href="#collections" class="btn-primary" style="margin-top: 20px;">Explore Collections</a>
+        </div>
+    </section>
+
+    <!-- Core Ethos (Mission, Vision, Values, Why Choose Us) -->
+    <section id="about" class="ethos-section">
+        <div class="container">
+            <!-- Why Choose Us -->
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Why Choose Babu Collection?</h2>
+                <div class="title-separator"></div>
+            </div>
+
+            <div class="features-grid" style="margin-bottom: 80px;">
+                <div class="feature-card glass" data-aos="fade-up">
+                    <div class="icon-wrapper"><i class="fas fa-gem"></i></div>
+                    <h3 id="feature1Title">Luxury Craftsmanship</h3>
+                    <p id="feature1Desc">Finest materials and utmost attention to detail.</p>
+                </div>
+                <div class="feature-card glass" data-aos="fade-up" data-aos-delay="100">
+                    <div class="icon-wrapper"><i class="fas fa-cut"></i></div>
+                    <h3 id="feature2Title">Custom Tailoring</h3>
+                    <p id="feature2Desc">Bespoke tailoring tailored specifically to your measurements.</p>
+                </div>
+                <div class="feature-card glass" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon-wrapper"><i class="fas fa-crown"></i></div>
+                    <h3 id="feature3Title">Exclusive Designs</h3>
+                    <p id="feature3Desc">Unique patterns, sophisticated embroidery, and modern cuts.</p>
+                </div>
+            </div>
+
+            <!-- Mission, Vision, Values -->
+            <div class="mvv-container">
+                <div class="mvv-card glass" data-aos="fade-right">
+                    <h3 class="text-gold"><i class="fas fa-bullseye"></i> Our Mission</h3>
+                    <p id="text-mission">To make every groom and bride feel like royalty through uncompromising quality
+                        and unparalleled bespoke service.</p>
+                </div>
+                <div class="mvv-card glass" data-aos="fade-up">
+                    <h3 class="text-gold"><i class="fas fa-eye"></i> Our Vision</h3>
+                    <p id="text-vision">To bring world-class fashion to our people, preserving our culture while
+                        embracing modern luxury.</p>
+                </div>
+                <div class="mvv-card glass" data-aos="fade-left">
+                    <h3 class="text-gold"><i class="fas fa-heart"></i> Our Values</h3>
+                    <p id="text-values">Rooted in quality, integrity, customer satisfaction, and a deep respect for our
+                        heritage.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Owner Profile & Stats Section -->
+    <section class="owner-section glass-bg">
+        <div class="container">
+            <div class="owner-grid">
+                <div class="owner-image-wrapper" data-aos="fade-right">
+                    <img src="images/owner.png" alt="Owner" id="owner-img">
+                </div>
+                <div class="owner-content" data-aos="fade-left">
+                    <h4 class="owner-role text-gold" id="ownerRole">Founder & CEO</h4>
+                    <h2 class="section-title text-left" style="margin-bottom: 20px;" id="ownerName">Amjad Makki</h2>
+
+                    <div class="story-content" id="ownerStory">
+                        <p>Established in 2010, Babu Collection began with a simple dream: to redefine elegance and
+                            fashion in Pakistan...</p>
+                    </div>
+
+                    <div class="stats-mini">
+                        <div class="stat">
+                            <span class="counter text-glow" data-target="2010" id="statYear">2010</span>
+                            <label>Est.</label>
+                        </div>
+                        <div class="stat">
+                            <span class="counter text-glow" data-target="15000" id="statClients">15000</span><span
+                                class="text-glow">+</span>
+                            <label>Customers Served</label>
+                        </div>
+                        <div class="stat">
+                            <span class="counter text-glow" data-target="99" id="statRate">99</span><span
+                                class="text-glow">%</span>
+                            <label>Satisfaction Rate</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What We Offer -->
+    <section id="offer" class="offer-section">
+        <div class="container text-center">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">What We Offer</h2>
+                <p class="section-subtitle">A complete ensemble for the modern gentleman and radiant bride.</p>
+                <div class="title-separator"></div>
+            </div>
+
+            <div class="offer-list" data-aos="zoom-in">
+                <span class="offer-tag">Premium Sherwanis</span>
+                <span class="offer-tag">Bespoke Prince Coats</span>
+                <span class="offer-tag">Custom Three-Piece Suits</span>
+                <span class="offer-tag">Embroidered Waistcoats</span>
+                <span class="offer-tag">Bridal Lehngas</span>
+                <span class="offer-tag">Traditional Khussas & Kullas</span>
+                <span class="offer-tag">Tailoring & Alterations</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Masterpiece Collections -->
+    <section id="collections" class="collection-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Our Collections</h2>
+                <div class="title-separator"></div>
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="tabs-container" data-aos="fade-up">
+                <button class="tab-btn active" data-tab="sherwani">Sherwani</button>
+                <button class="tab-btn" data-tab="princecoat">Prince Coat</button>
+                <button class="tab-btn" data-tab="threepiece">Three Piece</button>
+                <button class="tab-btn" data-tab="waistcoat">Waistcoat</button>
+                <button class="tab-btn" data-tab="bridal">Bridal Lehnga</button>
+            </div>
+
+            <div class="tab-content active" id="tab-sherwani">
+                <div class="gallery-grid" id="grid-sherwani"></div>
+            </div>
+            <div class="tab-content" id="tab-princecoat">
+                <div class="gallery-grid" id="grid-princecoat"></div>
+            </div>
+            <div class="tab-content" id="tab-threepiece">
+                <div class="gallery-grid" id="grid-threepiece"></div>
+            </div>
+            <div class="tab-content" id="tab-waistcoat">
+                <div class="gallery-grid" id="grid-waistcoat"></div>
+            </div>
+            <div class="tab-content" id="tab-bridal">
+                <div class="gallery-grid" id="grid-bridal"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews & Customer Feedback Note -->
+    <section id="reviews" class="reviews-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Customer Feedback Note</h2>
+                <div class="title-separator"></div>
+                <p style="margin-top: 20px; color: #ccc; max-width: 800px; margin-inline: auto;">
+                    We deeply value the trust thousands of clients have placed in us. Your satisfaction is the
+                    cornerstone of Babu Collection. Below are honest experiences from our cherished customers.
+                </p>
+            </div>
+
+            <div class="swiper reviewsSwiper" data-aos="fade-up" data-aos-delay="200">
+                <div class="swiper-wrapper" id="reviews-wrapper">
+                    <!-- Loaded via JS -->
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section glass-bg">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <div class="title-separator"></div>
+            </div>
+            <div class="faq-accordion" data-aos="fade-up">
+                <div class="faq-item">
+                    <div class="faq-question">Do you offer custom sizes for Sherwanis and Lehngas? <i
+                            class="fas fa-chevron-down"></i></div>
+                    <div class="faq-answer">Yes, our entire promise relies on Custom Bespoke Tailoring. We take exact
+                        measurements to ensure flawless fitting.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">How do I place an order online? <i class="fas fa-chevron-down"></i></div>
+                    <div class="faq-answer">Browse our collection and click the "Order on WhatsApp" button beneath the
+                        product you like. It will connect you directly to our sales team with your inquiry.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Do you ship outside of Pakistan? <i class="fas fa-chevron-down"></i></div>
+                    <div class="faq-answer">Yes, we provide international shipping for our overseas clients. Delivery
+                        charges and timelines vary by country.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-about">
+                <h3 class="logo-text">Babu Collection</h3>
+                <p>A true symbol of luxury fashion and bespoke tailoring.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+            <div class="footer-contact">
+                <h3>Contact Information</h3>
+                <p><i class="fas fa-map-marker-alt text-gold"></i> Rizwan Arcade, Pizza Hutt Plaza, Addam Gee Road,
+                    Saddar, Rawalpindi, Pakistan</p>
+                <p><i class="fab fa-whatsapp text-gold"></i> +92 332 5158303</p>
+                <p><i class="fas fa-envelope text-gold"></i> info@babucollection.pk</p>
+            </div>
+            <div class="footer-links">
+                <h3>Explore</h3>
+                <a href="#home">Home</a>
+                <a href="#offer">What We Offer</a>
+                <a href="#collections">Collections</a>
+                <a href="#reviews">Feedback</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <span id="current-year"></span> Babu Collection. Established in 2010. All Rights Reserved. <br><a
+                    href="admin.html" style="color:#444;text-decoration:none;font-size:0.8rem;">Admin Portal</a></p>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Icon -->
+    <a href="https://wa.me/923325158303" target="_blank" class="floating-whatsapp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="script.js?v=6"></script>
+</body>
+
+</html>
