@@ -45,10 +45,36 @@ const defaultData = {
         ]
     },
     reviews: [
-        { name: "Ahmed Khan", text: "Got my sherwani from Babu Collection. The fitting, the intricate detail, and the premium fabric exceeded my expectations. Amjad bhai truly knows his craft." },
-        { name: "Fatima Ali", text: "The crimson bridal lehnga was breathtaking. Everything from the heavy stone work to the majestic fall of the fabric was perfect. Highly recommended for any bride to be!" },
-        { name: "Usman Tariq", text: "I ordered a bespoke Prince Coat and it was delivered flawlessly. The dark blue fabric with silver accents turned heads everywhere. Excellent customer service as well." }
-    ]
+        { name: "Ahmed Khan", date: "February 28, 2026", text: "Got my sherwani from Babu Collection. The fitting, the intricate detail, and the premium fabric exceeded my expectations. Amjad bhai truly knows his craft." },
+        { name: "Fatima Ali", date: "March 01, 2026", text: "The crimson bridal lehnga was breathtaking. Everything from the heavy stone work to the majestic fall of the fabric was perfect. Highly recommended for any bride to be!" },
+        { name: "Usman Tariq", date: "March 02, 2026", text: "I ordered a bespoke Prince Coat and it was delivered flawlessly. The dark blue fabric with silver accents turned heads everywhere. Excellent customer service as well." }
+    ],
+    businessHours: {
+        monday: "11:00 AM - 10:00 PM",
+        tuesday: "11:00 AM - 10:00 PM",
+        wednesday: "11:00 AM - 10:00 PM",
+        thursday: "11:00 AM - 10:00 PM",
+        friday: "03:00 PM - 11:00 PM",
+        saturday: "11:00 AM - 11:00 PM",
+        sunday: "11:00 AM - 11:00 PM"
+    },
+    faqs: {
+        shop: [
+            { q: "Do you offer Wood furniture customization?", a: "While our primary focus is luxury fashion, our parent company Sapna Furniture handles all premium wood furniture customization." },
+            { q: "Do you offer Home delivery for dresses?", a: "Yes, we offer secure home delivery across Pakistan and international shipping options." },
+            { q: "When is your next big sale?", a: "We typically have seasonal sales during Eid and the wedding season. Sign up for our newsletter to get notified." }
+        ],
+        support: [
+            { q: "How can I track my order?", a: "Once your bespoke order is dispatched, you will receive a tracking link via email and WhatsApp." },
+            { q: "What is your return policy?", a: "Since all items are custom-made to your measurements, we do not offer returns. However, we provide free alterations within 7 days of delivery." },
+            { q: "How can I contact the Help Center?", a: "You can reach us 24/7 via WhatsApp at +92 332 5158303 or email us at info@babucollection.pk." }
+        ],
+        legal: [
+            { q: "Terms and Services", a: "Our terms and services outline the agreement between you and Babu Collection for bespoke fashion tailored specifically for you. By placing an order, you agree to our standard non-refundable deposit terms." },
+            { q: "Privacy Policy", a: "We value your privacy. Your personal details, measurements, and payment information are encrypted and never shared with third parties." },
+            { q: "Cookies Policy", a: "We use essential cookies to ensure our website functions correctly and to save your theme preferences." }
+        ]
+    }
 };
 
 // Application State
@@ -67,6 +93,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let appData = defaultData;
+
+// Cart State
+let cart = JSON.parse(localStorage.getItem('babu-cart')) || [];
+let currentDiscount = 0; // percentage
 
 // Monitor connection state
 const connectedRef = db.ref(".info/connected");
@@ -116,12 +146,57 @@ function renderData() {
     const ownerImg = document.getElementById('owner-img');
     if (ownerImg) ownerImg.src = appData.images.ownerImg;
 
+    // Render Business Hours
+    renderBusinessHours();
+
+    // Render Categorized FAQs
+    renderFAQs();
+
     // Render Collections
     const categories = ['sherwani', 'princecoat', 'threepiece', 'waistcoat', 'bridal'];
     categories.forEach(cat => renderCategory(cat));
 
     // Render Reviews
     renderReviews();
+}
+
+function renderBusinessHours() {
+    const hoursContainer = document.getElementById('business-hours-container');
+    if (!hoursContainer) return;
+
+    let html = '';
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    days.forEach(day => {
+        const hours = appData.businessHours[day];
+        html += `
+            <div class="hours-row">
+                <span class="day">${day.charAt(0).toUpperCase() + day.slice(1)}</span>
+                <span class="time">${hours}</span>
+            </div>
+        `;
+    });
+    hoursContainer.innerHTML = html;
+}
+
+function renderFAQs() {
+    ['shop', 'support', 'legal'].forEach(category => {
+        const container = document.getElementById(`faq-list-${category}`);
+        if (!container) return;
+
+        let html = '';
+        appData.faqs[category].forEach(item => {
+            html += `
+                <div class="faq-item">
+                    <div class="faq-question">${item.q} <i class="fas fa-chevron-down"></i></div>
+                    <div class="faq-answer">${item.a}</div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    });
+
+    // Re-initialize FAQ toggle events for newly rendered elements
+    initFAQ();
 }
 
 function renderCategory(cat) {
@@ -143,7 +218,10 @@ function renderCategory(cat) {
                 <h3 class="product-title">${item.title}</h3>
                 <p class="product-desc">${item.desc}</p>
                 <span class="product-price text-gold">${item.price || ''}</span>
-                <a href="${waLink}" target="_blank" class="wa-order-btn">
+                <button class="btn-primary" style="width: 100%; border-radius: 4px; padding: 10px; margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem;" onclick="addToCart('${item.title}', '${item.price}', '${item.img}')">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+                <a href="${waLink}" target="_blank" class="wa-order-btn" style="margin-top: 5px;">
                     <i class="fab fa-whatsapp"></i> Order on WhatsApp
                 </a>
             </div>
@@ -160,9 +238,11 @@ function renderReviews() {
     appData.reviews.forEach(review => {
         const slide = document.createElement('div');
         slide.className = 'swiper-slide';
+        const dateHtml = review.date ? `<span class="review-date">${review.date}</span>` : '';
         slide.innerHTML = `
             <div class="review-slide-card">
                 <i class="fas fa-quote-left"></i>
+                ${dateHtml}
                 <p class="review-text">"${review.text}"</p>
                 <h4 class="review-name">- ${review.name}</h4>
             </div>
@@ -248,6 +328,344 @@ function initFAQ() {
     });
 }
 
+/* ====== 4. Theme & Firebase Auth ====== */
+
+function initTheme() {
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const icon = document.getElementById('theme-icon');
+
+    // Check saved theme or default to dark
+    const savedTheme = localStorage.getItem('babu-theme') || 'dark';
+
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+        if (icon) icon.className = 'fas fa-sun';
+    }
+
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            let theme = 'dark';
+            if (document.body.classList.contains('light-theme')) {
+                theme = 'light';
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+            localStorage.setItem('babu-theme', theme);
+        });
+    }
+}
+
+function initAuth() {
+    const authBtnText = document.getElementById('auth-btn-text');
+    const authBtn = document.getElementById('auth-btn');
+    const loginModal = document.getElementById('login-modal');
+    const signupModal = document.getElementById('signup-modal');
+
+    // Listen to Auth State changes
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            // User is signed in
+            if (authBtnText) authBtnText.innerText = "Profile / Logout";
+            if (authBtn) {
+                authBtn.onclick = () => {
+                    const confirmLogout = confirm(`Logged in as ${user.email}. Do you want to logout?`);
+                    if (confirmLogout) {
+                        firebase.auth().signOut().then(() => alert('Logged out successfully.')).catch(e => alert(e.message));
+                    }
+                };
+            }
+        } else {
+            // User is signed out
+            if (authBtnText) authBtnText.innerText = "Login / Sign Up";
+            if (authBtn) {
+                authBtn.onclick = () => {
+                    loginModal.classList.add('active');
+                };
+            }
+        }
+    });
+
+    // Close Modals Setup
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.target.closest('.auth-modal').classList.remove('active');
+        });
+    });
+
+    // Switch between Login and Signup
+    const showSignup = document.getElementById('show-signup');
+    const showLogin = document.getElementById('show-login');
+
+    if (showSignup) {
+        showSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.classList.remove('active');
+            signupModal.classList.add('active');
+        });
+    }
+
+    if (showLogin) {
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupModal.classList.remove('active');
+            loginModal.classList.add('active');
+        });
+    }
+
+    // Handle Forms
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    alert('Login successful!');
+                    loginModal.classList.remove('active');
+                    loginForm.reset();
+                })
+                .catch((error) => alert('Login Error: ' + error.message));
+        });
+    }
+
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = signupForm.email.value;
+            const password = signupForm.password.value;
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    alert('Registration successful!');
+                    signupModal.classList.remove('active');
+                    signupForm.reset();
+                })
+                .catch((error) => alert('Registration Error: ' + error.message));
+        });
+    }
+}
+
+/* ====== 5. Cart & Checkout ====== */
+
+function initCart() {
+    updateCartUI();
+
+    const cartBtn = document.getElementById('cart-btn');
+    const cartDropdown = document.getElementById('cart-dropdown');
+
+    if (cartBtn && cartDropdown) {
+        cartBtn.addEventListener('click', () => {
+            cartDropdown.classList.toggle('active');
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.cart-wrapper')) {
+                cartDropdown.classList.remove('active');
+            }
+        });
+    }
+
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const checkoutModal = document.getElementById('checkout-modal');
+    if (checkoutBtn && checkoutModal) {
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert("Your cart is empty.");
+                return;
+            }
+            cartDropdown.classList.remove('active');
+            renderCheckoutSummary();
+            checkoutModal.classList.add('active');
+        });
+    }
+
+    // Checkout Logic
+    const applyDiscountBtn = document.getElementById('apply-discount-btn');
+    if (applyDiscountBtn) {
+        applyDiscountBtn.addEventListener('click', () => {
+            const code = document.getElementById('chk-discount').value.trim().toUpperCase();
+            if (code === 'BABU10') {
+                currentDiscount = 10;
+                alert('10% Discount Applied!');
+            } else {
+                currentDiscount = 0;
+                alert('Invalid or expired code.');
+            }
+            renderCheckoutSummary();
+        });
+    }
+
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            processCheckout();
+        });
+    }
+}
+
+window.addToCart = function (title, priceStr, img) {
+    // Basic extraction of number from "Rs. 45,000"
+    const priceNum = parseInt(priceStr.replace(/[^0-9]/g, '')) || 0;
+
+    const existing = cart.find(i => i.title === title);
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        cart.push({ title, price: priceNum, priceStr, img, qty: 1 });
+    }
+
+    saveCart();
+    updateCartUI();
+    document.getElementById('cart-dropdown').classList.add('active');
+    setTimeout(() => document.getElementById('cart-dropdown').classList.remove('active'), 2500);
+};
+
+window.removeFromCart = function (index) {
+    cart.splice(index, 1);
+    saveCart();
+    updateCartUI();
+    renderCheckoutSummary();
+};
+
+function saveCart() {
+    localStorage.setItem('babu-cart', JSON.stringify(cart));
+}
+
+function updateCartUI() {
+    const badge = document.getElementById('cart-badge');
+    const container = document.getElementById('cart-items-container');
+    const totalEl = document.getElementById('cart-total-price');
+
+    if (!badge || !container) return;
+
+    let totalQty = 0;
+    let totalPrice = 0;
+    let html = '';
+
+    cart.forEach((item, index) => {
+        totalQty += item.qty;
+        totalPrice += (item.price * item.qty);
+        html += `
+            <div class="cart-item">
+                <img src="${item.img}" alt="${item.title}">
+                <div class="cart-item-info">
+                    <div class="cart-item-title">${item.title}</div>
+                    <div class="cart-item-price">${item.priceStr} (x${item.qty})</div>
+                </div>
+                <button class="cart-item-remove" onclick="removeFromCart(${index})">&times;</button>
+            </div>
+        `;
+    });
+
+    if (cart.length === 0) {
+        html = '<p style="color:var(--text-muted); text-align:center; padding: 20px 0;">Cart is empty.</p>';
+    }
+
+    badge.innerText = totalQty;
+    container.innerHTML = html;
+    totalEl.innerText = 'Rs. ' + totalPrice.toLocaleString();
+}
+
+function renderCheckoutSummary() {
+    const container = document.getElementById('checkout-summary-items');
+    const totalEl = document.getElementById('chk-final-total');
+    if (!container || !totalEl) return;
+
+    let html = '';
+    let subtotal = 0;
+
+    cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+        html += `
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.95rem;">
+                <span>${item.qty}x ${item.title}</span>
+                <span class="text-gold">Rs. ${itemTotal.toLocaleString()}</span>
+            </div>
+        `;
+    });
+
+    let discountAmount = 0;
+    if (currentDiscount > 0) {
+        discountAmount = subtotal * (currentDiscount / 100);
+        html += `
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.95rem; color:#2ecc71;">
+                <span>Discount (${currentDiscount}%)</span>
+                <span>- Rs. ${discountAmount.toLocaleString()}</span>
+            </div>
+        `;
+    }
+
+    const total = subtotal - discountAmount;
+    container.innerHTML = html;
+    totalEl.innerText = 'Rs. ' + total.toLocaleString();
+}
+
+function processCheckout() {
+    if (cart.length === 0) return;
+
+    const name = document.getElementById('chk-name').value;
+    const phone = document.getElementById('chk-phone').value;
+    const address = document.getElementById('chk-address').value;
+    const city = document.getElementById('chk-city').value;
+
+    let subtotal = 0;
+    let itemsStr = '';
+    cart.forEach(item => {
+        subtotal += item.price * item.qty;
+        itemsStr += `- ${item.qty}x ${item.title} (Rs. ${(item.price * item.qty).toLocaleString()})\n`;
+    });
+
+    const discountAmount = subtotal * (currentDiscount / 100);
+    const total = subtotal - discountAmount;
+
+    // 1. Save to Firebase
+    const orderData = {
+        date: new Date().toISOString(),
+        status: 'Pending',
+        customer: { name, phone, address, city },
+        items: cart,
+        subtotal: subtotal,
+        discountPercent: currentDiscount,
+        total: total,
+        paymentMethod: 'JazzCash'
+    };
+
+    db.ref('babuPremiumOrders').push(orderData)
+        .then(() => {
+            // 2. Format WhatsApp Message
+            const waPhone = "923325158303";
+            let msg = `*NEW ORDER - Babu Collection*\n\n`;
+            msg += `*Name:* ${name}\n`;
+            msg += `*Phone:* ${phone}\n`;
+            msg += `*Address:* ${address}, ${city}\n\n`;
+            msg += `*Items:*\n${itemsStr}\n`;
+            if (currentDiscount > 0) msg += `*Discount:* ${currentDiscount}%\n`;
+            msg += `*Total Amount:* Rs. ${total.toLocaleString()}\n`;
+            msg += `*Payment Method:* JazzCash Transfer (Pending)\n\n`;
+            msg += `Please confirm my order details.`;
+
+            const waLink = `https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`;
+
+            // Clear cart
+            cart = [];
+            currentDiscount = 0;
+            saveCart();
+            updateCartUI();
+
+            document.getElementById('checkout-modal').classList.remove('active');
+
+            // Redirect to WhatsApp
+            window.open(waLink, '_blank');
+        })
+        .catch(err => alert("Error processing order: " + err.message));
+}
+
 // Init everything
 document.addEventListener('DOMContentLoaded', () => {
     const yearEl = document.getElementById('current-year');
@@ -257,7 +675,24 @@ document.addEventListener('DOMContentLoaded', () => {
     initTabs();
     initCursor();
     runCounters();
-    initFAQ();
+    initTheme();
+    initAuth();
+    initCart();
+    // initFAQ is called after data is rendered in renderFAQs
+
+    // FAQ Category Tabs Logic
+    const faqTabs = document.querySelectorAll('.faq-cat-btn');
+    if (faqTabs.length > 0) {
+        faqTabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                faqTabs.forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.faq-category-content').forEach(c => c.style.display = 'none');
+
+                btn.classList.add('active');
+                document.getElementById('faq-' + btn.getAttribute('data-cat')).style.display = 'block';
+            });
+        });
+    }
 
     // Navbar scroll
     window.addEventListener('scroll', () => {

@@ -50,8 +50,31 @@
                 <li><a href="#faq">FAQ</a></li>
             </ul>
         </nav>
-        <div class="nav-right" style="display:none;">
-            <!-- Removed Order Now button for cleaner look -->
+        <div class="nav-right" style="display:flex; align-items:center; gap: 20px;">
+            <button id="theme-toggle-btn" class="theme-btn" aria-label="Toggle Theme">
+                <i id="theme-icon" class="fas fa-moon"></i>
+            </button>
+            <div class="cart-wrapper" style="position: relative;">
+                <button id="cart-btn" class="theme-btn" style="position: relative;">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-badge" class="cart-badge">0</span>
+                </button>
+                <!-- Cart Dropdown -->
+                <div id="cart-dropdown" class="cart-dropdown glass">
+                    <h3>Your Cart</h3>
+                    <div id="cart-items-container">
+                        <!-- Items rendered here via JS -->
+                    </div>
+                    <div class="cart-footer">
+                        <div class="cart-total">Total: <span id="cart-total-price" class="text-gold">Rs. 0</span></div>
+                        <button id="checkout-btn" class="btn-primary"
+                            style="width: 100%; padding: 10px; font-size: 0.9rem;">Proceed to Checkout</button>
+                    </div>
+                </div>
+            </div>
+            <button id="auth-btn" class="btn-primary" style="padding: 8px 20px; font-size: 0.9rem;">
+                <i class="fas fa-user"></i> <span id="auth-btn-text">Login / Sign Up</span>
+            </button>
         </div>
     </header>
 
@@ -239,22 +262,28 @@
                 <h2 class="section-title">Frequently Asked Questions</h2>
                 <div class="title-separator"></div>
             </div>
-            <div class="faq-accordion" data-aos="fade-up">
-                <div class="faq-item">
-                    <div class="faq-question">Do you offer custom sizes for Sherwanis and Lehngas? <i
-                            class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">Yes, our entire promise relies on Custom Bespoke Tailoring. We take exact
-                        measurements to ensure flawless fitting.</div>
+
+            <div class="faq-tabs" data-aos="fade-up">
+                <button class="faq-cat-btn active" data-cat="shop">Shop</button>
+                <button class="faq-cat-btn" data-cat="support">Support</button>
+                <button class="faq-cat-btn" data-cat="legal">Legal</button>
+            </div>
+
+            <div class="faq-category-content active" id="faq-shop" data-aos="fade-up" data-aos-delay="100">
+                <div class="faq-accordion" id="faq-list-shop">
+                    <!-- Shop FAQs rendered here -->
                 </div>
-                <div class="faq-item">
-                    <div class="faq-question">How do I place an order online? <i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">Browse our collection and click the "Order on WhatsApp" button beneath the
-                        product you like. It will connect you directly to our sales team with your inquiry.</div>
+            </div>
+
+            <div class="faq-category-content" id="faq-support" style="display:none;">
+                <div class="faq-accordion" id="faq-list-support">
+                    <!-- Support FAQs rendered here -->
                 </div>
-                <div class="faq-item">
-                    <div class="faq-question">Do you ship outside of Pakistan? <i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">Yes, we provide international shipping for our overseas clients. Delivery
-                        charges and timelines vary by country.</div>
+            </div>
+
+            <div class="faq-category-content" id="faq-legal" style="display:none;">
+                <div class="faq-accordion" id="faq-list-legal">
+                    <!-- Legal FAQs rendered here -->
                 </div>
             </div>
         </div>
@@ -279,6 +308,12 @@
                 <p><i class="fab fa-whatsapp text-gold"></i> +92 332 5158303</p>
                 <p><i class="fas fa-envelope text-gold"></i> info@babucollection.pk</p>
             </div>
+            <div class="footer-hours">
+                <h3>Business Hours</h3>
+                <div id="business-hours-container">
+                    <!-- Hours rendered here -->
+                </div>
+            </div>
             <div class="footer-links">
                 <h3>Explore</h3>
                 <a href="#home">Home</a>
@@ -298,9 +333,112 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
+    <!-- Auth Modals -->
+    <!-- Login Modal -->
+    <div class="auth-modal" id="login-modal">
+        <div class="modal-content glass">
+            <span class="close-modal">&times;</span>
+            <h2 class="section-title" style="font-size: 2rem;">Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn-primary glow-effect" style="width: 100%;">Login</button>
+            </form>
+            <p style="margin-top: 20px; text-align: center;">Don't have an account? <a href="#" id="show-signup"
+                    class="text-gold">Sign Up</a></p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="auth-modal" id="signup-modal">
+        <div class="modal-content glass">
+            <span class="close-modal">&times;</span>
+            <h2 class="section-title" style="font-size: 2rem;">Sign Up</h2>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="Create a password">
+                </div>
+                <button type="submit" class="btn-primary glow-effect" style="width: 100%;">Create Account</button>
+            </form>
+            <p style="margin-top: 20px; text-align: center;">Already have an account? <a href="#" id="show-login"
+                    class="text-gold">Login</a></p>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="auth-modal" id="checkout-modal">
+        <div class="modal-content glass" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+            <span class="close-modal">&times;</span>
+            <h2 class="section-title" style="font-size: 1.8rem; margin-bottom: 20px;">Secure Checkout</h2>
+
+            <form id="checkout-form">
+                <h3 class="text-gold" style="font-family: var(--font-heading); margin-bottom: 15px;">1. Delivery Details
+                </h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group"><label>Full Name</label><input type="text" id="chk-name" required></div>
+                    <div class="form-group"><label>Phone Number</label><input type="tel" id="chk-phone" required></div>
+                </div>
+                <div class="form-group"><label>Delivery Address</label><input type="text" id="chk-address" required>
+                </div>
+                <div class="form-group"><label>City</label><input type="text" id="chk-city" required></div>
+
+                <h3 class="text-gold" style="font-family: var(--font-heading); margin: 25px 0 15px;">2. Payment Method
+                </h3>
+                <div class="payment-method-box"
+                    style="padding: 15px; border: 1px solid var(--gold-primary); border-radius: 6px; background: rgba(212, 175, 55, 0.05); margin-bottom: 20px;">
+                    <strong>JazzCash Transfer</strong><br>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Please transfer the total amount to
+                        complete your order.</span><br>
+                    <div
+                        style="margin-top: 10px; font-family: monospace; font-size: 1.1rem; color: var(--gold-primary);">
+                        Account Title: Amjad Makki<br>
+                        Account Number: +92 332 5158303
+                    </div>
+                </div>
+
+                <h3 class="text-gold" style="font-family: var(--font-heading); margin: 25px 0 15px;">3. Order Summary
+                </h3>
+                <div id="checkout-summary-items"
+                    style="margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;">
+                    <!-- Filled by JS -->
+                </div>
+
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <input type="text" id="chk-discount" placeholder="Discount Code (Try BABU10)" style="flex: 1;">
+                    <button type="button" class="btn-primary" id="apply-discount-btn"
+                        style="padding: 10px 20px; font-size: 0.9rem;">Apply</button>
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 1.2rem; margin-bottom: 25px; font-weight: bold;">
+                    <span>Total To Pay:</span>
+                    <span id="chk-final-total" class="text-gold">Rs. 0</span>
+                </div>
+
+                <button type="submit" class="wa-order-btn" style="font-size: 1.1rem; margin-bottom: 10px;">
+                    <i class="fab fa-whatsapp"></i> Confirm & Send via WhatsApp
+                </button>
+                <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem;">An order record will also be
+                    securely saved in our system.</p>
+            </form>
+        </div>
+    </div>
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>

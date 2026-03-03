@@ -300,6 +300,100 @@ window.deleteAdminReview = function (index) {
     }
 };
 
+/* ================== ORDERS MANAGEMENT ================== */
+window.loadAdminOrders = function () {
+    if (typeof db === 'undefined') return;
+
+    const tbody = document.querySelector('#adminOrdersTable tbody');
+
+    db.ref('babuPremiumOrders').on('value', (snapshot) => {
+        tbody.innerHTML = '';
+
+        if (!snapshot.exists()) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No orders found.</td></tr>';
+            return;
+        }
+
+        const orders = snapshot.val();
+        // Convert to array and sort by date descending
+        const ordersArray = Object.keys(orders).map(key => ({
+            id: key,
+            ...orders[key]
+        })).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        ordersArray.forEach(order => {
+            const tr = document.createElement('tr');
+
+            // Format Date
+            const d = new Date(order.date);
+            const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            // Status Badge
+            let statusColor = '#3498db'; // Processing/Blue
+            if (order.status === 'Pending') statusColor = '#f1c40f'; // Yellow
+            if (order.status === 'Completed') statusColor = '#2ecc71'; // Green
+            if (order.status === 'Cancelled') statusColor = '#e74c3c'; // Red
+
+            const statusBadge = `<span style="background:${statusColor}; color:${statusColor === '#f1c40f' ? '#000' : '#fff'}; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">${order.status}</span>`;
+
+            tr.innerHTML = `
+                <td style="font-size: 0.8rem;">${dateStr}</td>
+                <td>
+                    <strong>${order.customer.name}</strong><br>
+                    <span style="font-size: 0.8rem; color:#aaa;">${order.customer.phone}</span>
+                </td>
+                <td class="text-gold">Rs. ${order.total.toLocaleString()}</td>
+                <td>${statusBadge}</td>
+                <td style="white-space:nowrap;">
+                    <button class="admin-btn" style="padding: 5px 10px; font-size: 0.8rem;" onclick="viewOrderDetails('${order.id}')"><i class="fas fa-eye"></i> View</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    });
+};
+
+window.viewOrderDetails = function (orderId) {
+    db.ref('babuPremiumOrders/' + orderId).once('value').then((snap) => {
+        const order = snap.val();
+        if (!order) return;
+
+        let itemsHtml = '';
+        order.items.forEach(item => {
+            itemsHtml += `- ${item.qty}x ${item.title} (Rs. ${(item.price * item.qty).toLocaleString()})\n`;
+        });
+
+        const details = `
+ORDER DETAILS:
+-----------------------
+Status: ${order.status}
+Date: ${new Date(order.date).toLocaleString()}
+Payment Method: ${order.paymentMethod || 'N/A'}
+
+CUSTOMER:
+Name: ${order.customer.name}
+Phone: ${order.customer.phone}
+Address: ${order.customer.address}, ${order.customer.city}
+
+ITEMS:
+${itemsHtml}
+Subtotal: Rs. ${order.subtotal.toLocaleString()}
+Discount Applied: ${order.discountPercent || 0}%
+Total to Pay: Rs. ${order.total.toLocaleString()}
+        `;
+
+        // Very basic simple view + action for now via prompt/alert
+        alert(details);
+
+        const newStatus = prompt("Update Status (Type: Pending, Processing, Completed, or Cancelled):", order.status);
+        if (newStatus && ['Pending', 'Processing', 'Completed', 'Cancelled'].includes(newStatus)) {
+            db.ref('babuPremiumOrders/' + orderId).update({ status: newStatus })
+                .then(() => alert("Status updated successfully!"))
+                .catch(err => alert("Failed to update status."));
+        }
+    });
+};
+
 // Initialize Admin UI
 document.addEventListener('DOMContentLoaded', () => {
     // Slight delay to ensure script.js has loaded appData
@@ -307,5 +401,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loadAdminTexts();
         loadAdminProducts();
         loadAdminReviews();
+        loadAdminOrders();
     }, 200);
 });

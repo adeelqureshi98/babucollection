@@ -12,11 +12,29 @@
     --text-muted: #A0A0A0;
 
     --font-heading: 'Cinzel', serif;
+    --font-heading: 'Cinzel', serif;
     --font-sub: 'Playfair Display', serif;
     --font-body: 'Montserrat', sans-serif;
 
     --glass-border: rgba(212, 175, 55, 0.2);
     --glass-bg: rgba(15, 15, 15, 0.4);
+}
+
+/* Light Theme Overrides */
+body.light-theme {
+    --gold-primary: #B8860B;
+    /* Darker gold for better contrast */
+    --gold-light: #D4AF37;
+    --gold-dark: #8B6508;
+    --bg-dark: #FDFBF7;
+    /* Ivory / Off-white */
+    --bg-card: rgba(255, 255, 255, 0.8);
+    --text-main: #1A1A1A;
+    /* Dark gray for readability */
+    --text-muted: #555555;
+
+    --glass-border: rgba(184, 134, 11, 0.3);
+    --glass-bg: rgba(255, 255, 255, 0.7);
 }
 
 * {
@@ -272,6 +290,14 @@ body.edit-mode [data-edit-key]:focus {
     backdrop-filter: blur(10px);
 }
 
+body.light-theme .navbar {
+    background: rgba(253, 251, 247, 0.9);
+}
+
+body.light-theme .navbar.scrolled {
+    background: rgba(253, 251, 247, 0.98);
+}
+
 .logo-text {
     font-family: var(--font-heading);
     font-size: 2rem;
@@ -408,6 +434,227 @@ body.edit-mode [data-edit-key]:focus {
     background: var(--bg-dark);
 }
 
+/* Auth Modals & Theme Button */
+.theme-btn {
+    background: transparent;
+    border: 1px solid var(--gold-primary);
+    color: var(--gold-primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.theme-btn:hover {
+    background: var(--gold-primary);
+    color: var(--bg-dark);
+}
+
+/* Cart Badge & Dropdown */
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #e74c3c;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.cart-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 320px;
+    background: var(--bg-dark);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
+.cart-dropdown.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.cart-dropdown h3 {
+    font-family: var(--font-heading);
+    color: var(--gold-primary);
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+#cart-items-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+body.light-theme .cart-item {
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.cart-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-title {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--text-main);
+    font-weight: bold;
+}
+
+.cart-item-price {
+    font-size: 0.85rem;
+    color: var(--gold-primary);
+}
+
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.cart-item-remove:hover {
+    color: #c0392b;
+}
+
+.cart-footer {
+    border-top: 1px solid var(--glass-border);
+    padding-top: 15px;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: var(--text-main);
+    margin-bottom: 15px;
+}
+
+/* Modals */
+.auth-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.auth-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.auth-modal .modal-content {
+    background: var(--bg-dark);
+    padding: 40px;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 12px;
+    position: relative;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.auth-modal.active .modal-content {
+    transform: translateY(0);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-modal:hover {
+    color: var(--gold-primary);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+body.light-theme .form-group input {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.form-group input:focus {
+    border-color: var(--gold-primary);
+}
+
 .mvv-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -494,6 +741,33 @@ body.edit-mode [data-edit-key]:focus {
 .faq-accordion {
     max-width: 800px;
     margin: 0 auto;
+}
+
+.faq-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.faq-cat-btn {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    padding: 8px 25px;
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+.faq-cat-btn:hover,
+.faq-cat-btn.active {
+    background: var(--gold-primary);
+    color: var(--bg-dark);
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
 }
 
 .faq-item {
@@ -873,7 +1147,15 @@ body.edit-mode .product-delete-btn {
     font-size: 1.1rem;
     font-style: italic;
     margin-bottom: 20px;
-    color: #eee;
+    color: var(--text-main);
+    /* Changed from #eee for light theme support */
+}
+
+.review-date {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
 }
 
 .review-name {
@@ -921,6 +1203,21 @@ body.edit-mode .add-review-btn-container {
     color: var(--gold-primary);
     margin-bottom: 25px;
     font-size: 1.3rem;
+}
+
+/* Business Hours Footer */
+.footer-hours .hours-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+.footer-hours .hours-row .day {
+    color: var(--text-main);
 }
 
 .footer p {
